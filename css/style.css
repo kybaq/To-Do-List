@@ -1,0 +1,12 @@
+/* components */
+
+/* screens */
+@import url("./screens/toDo.css");
+@import url("./screens/home.css");
+
+body {
+    width: 100%;
+    height: 100vh;
+    background-size: cover;
+}
+
