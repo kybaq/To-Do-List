@@ -1,7 +1,9 @@
 /* components */
+@import url("./components/toDo.css");
+@import url("./components/quote.css");
+@import url("./components/weather.css");
 
 /* screens */
-@import url("./screens/toDo.css");
 @import url("./screens/home.css");
 
 body {

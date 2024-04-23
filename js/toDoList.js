@@ -4,67 +4,70 @@ const toDoList = document.querySelector(".to-do__list");
 
 let todos = [];
 
-function setToDo(event) {
-    event.preventDefault();
+function handleSubmit(event) {
+  event.preventDefault();
 
-    todos.push(toDoInput.value);
+  const todoValue = toDoInput.value;
 
-    window.localStorage.setItem("todos", todos);
-    
-    printToDo();
+  toDoInput.value = "";
+
+  const newToDoObj = {
+    id: Date.now(),
+    todo: todoValue,
+  };
+
+  todos.push(newToDoObj);
+  printToDo(newToDoObj);
+  setToDo();
 }
 
-function printToDo() {
+function setToDo() {
+  window.localStorage.setItem("todos", JSON.stringify(todos));
+}
 
-    let storedtodos = window.localStorage.getItem("todos");// 여기서 문자열이 됨.
+function printToDo(todos) {
+  // <ul> 내부에 <li> 을 추가해서 보여주는 형식.
+  // list item 생성
+  let item = document.createElement("li");
+  // css id 를 부여
+  item.setAttribute("id", todos["id"]);
+  // css class 부여
+  item.setAttribute("class", "to-do__item");
 
-    let splittodos = storedtodos.split(",");
-    // <ul> 내부에 <li> 을 추가해서 보여주는 형식.
-    Array.from(splittodos).forEach(element => { 
-        let item = document.createElement("li");
-        item.setAttribute("class", "to-do__item");
+  let btn = document.createElement("button");
+  btn.setAttribute("class", "to-do__remove");
+  btn.addEventListener("click", deleteToDo);
 
-        let btn = document.createElement("button");  
-        btn.setAttribute("class", "to-do__remove");
+  let itemContent = document.createTextNode(todos["todo"]);
+  let btnContent = document.createTextNode("✖️");
 
-        let itemContent = document.createTextNode(element);
-        let btnContent = document.createTextNode("✖️");
-    
-        btn.appendChild(btnContent);
-        item.appendChild(itemContent);
-        item.appendChild(btn);
+  btn.appendChild(btnContent);
+  item.appendChild(itemContent);
+  item.appendChild(btn);
 
-        toDoList.appendChild(item);
-    });
+  toDoList.appendChild(item);
 }
 
 function deleteToDo(event) {
-    // 버튼 click이 일어나면 remove
-    const li = event.target.parentElement;
-    const liContent = li.firstChild.data;
+  // 버튼 click이 일어나면 remove
+  const li = event.target.parentElement;
 
-    li.remove();    
-    // todos 에서 liContent 를 제외해서 다시 등록하면 될 것이다!
-    console.log(todos.filter(liContent));
+  li.remove();
 
+  // todos 에서 li 가 같은 경우 를 제외해서 다시 등록하면 될 것이다!
+  todos = todos.filter((todo) => todo["id"] !== parseInt(li.id));
+
+  setToDo();
 }
 
-function isRightContent(params) {
-    
+// function isRightContent(params) {}
+toDoForm.addEventListener("submit", handleSubmit);
+
+const storedTodos = window.localStorage.getItem("todos"); // 여기서 문자열이 됨.
+
+if (storedTodos !== null) {
+  const parsedTodos = JSON.parse(storedTodos);
+  todos = parsedTodos; // String -> 배열
+
+  parsedTodos.forEach(printToDo);
 }
-
-if (window.localStorage.getItem("todos") !== null){
-    printToDo();
-
-    const toDoBtn = document.querySelectorAll(".to-do__remove"); // Node"List" 반환.
-
-    toDoBtn.forEach(element => {
-        element.addEventListener("click", deleteToDo);
-    });
-
-} else {
-    ;
-}
-
-
-toDoForm.addEventListener("submit", setToDo);
